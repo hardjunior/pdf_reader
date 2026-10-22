@@ -1,0 +1,35 @@
+Windows Registry Editor Version 5.00
+
+; Registra o aplicativo LeitorPDF no Windows
+[HKEY_CURRENT_USER\Software\Classes\Applications\LeitorPDF.exe]
+"FriendlyAppName"="Leitor de PDF"
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\LeitorPDF.exe\SupportedTypes]
+".pdf"=""
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\LeitorPDF.exe\shell]
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\LeitorPDF.exe\shell\open]
+@="Abrir com Leitor de PDF"
+
+[HKEY_CURRENT_USER\Software\Classes\Applications\LeitorPDF.exe\shell\open\command]
+@="\"D:\\Projetos\\python\\pdf_reader\\LeitorPDF.exe\" \"%1\""
+
+; Registra a associacao para arquivos .pdf
+[HKEY_CURRENT_USER\Software\Classes\LeitorPDF.Document]
+@="Documento PDF"
+
+[HKEY_CURRENT_USER\Software\Classes\LeitorPDF.Document\DefaultIcon]
+@="\"D:\\Projetos\\python\\pdf_reader\\LeitorPDF.exe\",0"
+
+[HKEY_CURRENT_USER\Software\Classes\LeitorPDF.Document\shell]
+
+[HKEY_CURRENT_USER\Software\Classes\LeitorPDF.Document\shell\open]
+@="Abrir"
+
+[HKEY_CURRENT_USER\Software\Classes\LeitorPDF.Document\shell\open\command]
+@="\"D:\\Projetos\\python\\pdf_reader\\LeitorPDF.exe\" \"%1\""
+
+; Inclui nas listas de "Abrir com" para extensao .pdf
+[HKEY_CURRENT_USER\Software\Classes\.pdf\OpenWithProgids]
+"LeitorPDF.Document"=""
