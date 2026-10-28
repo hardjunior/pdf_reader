@@ -10,7 +10,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, QThread, QSize
 from PyQt6.QtGui import QIcon, QPixmap, QImage, QColor
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
-    QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel
+    QTreeWidget, QTreeWidgetItem, QTabWidget, QLabel, QMenu
 )
 
 
@@ -49,8 +49,15 @@ class ThumbnailWorker(QThread):
 
 
 class ThumbnailListWidget(QListWidget):
-    """Lista de miniaturas das páginas estilo Adobe Reader"""
+    """Lista de miniaturas das páginas estilo Adobe Reader com menu contextual"""
     pageSelected = pyqtSignal(int)
+    exportPagePdfRequested = pyqtSignal(int)
+    exportPageImageRequested = pyqtSignal(int)
+    splitPagesRequested = pyqtSignal()
+    importPdfRequested = pyqtSignal(int)
+    importImageRequested = pyqtSignal(int)
+    rotatePageRequested = pyqtSignal(int)
+    deletePageRequested = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -62,6 +69,46 @@ class ThumbnailListWidget(QListWidget):
         self.setSpacing(8)
         self.itemClicked.connect(self._on_item_clicked)
         self._worker = None
+
+    def contextMenuEvent(self, event):
+        item = self.itemAt(event.pos())
+        if not item:
+            return
+        page_idx = item.data(Qt.ItemDataRole.UserRole)
+        if page_idx is None:
+            return
+
+        self.setCurrentItem(item)
+        self.pageSelected.emit(page_idx)
+
+        menu = QMenu(self)
+
+        act_exp_pdf = menu.addAction(f"📤 Exportar Página {page_idx + 1} como PDF...")
+        act_exp_pdf.triggered.connect(lambda: self.exportPagePdfRequested.emit(page_idx))
+
+        act_exp_img = menu.addAction(f"🖼️ Exportar Página {page_idx + 1} como Imagem...")
+        act_exp_img.triggered.connect(lambda: self.exportPageImageRequested.emit(page_idx))
+
+        act_split = menu.addAction("✂️ Separar / Dividir Páginas...")
+        act_split.triggered.connect(self.splitPagesRequested.emit)
+
+        menu.addSeparator()
+
+        act_imp_pdf = menu.addAction(f"➕ Inserir Páginas de PDF aqui...")
+        act_imp_pdf.triggered.connect(lambda: self.importPdfRequested.emit(page_idx + 1))
+
+        act_imp_img = menu.addAction(f"🖼️ Inserir Imagem como Página aqui...")
+        act_imp_img.triggered.connect(lambda: self.importImageRequested.emit(page_idx + 1))
+
+        menu.addSeparator()
+
+        act_rot = menu.addAction(f"↻ Girar Página {page_idx + 1} Permanentemente")
+        act_rot.triggered.connect(lambda: self.rotatePageRequested.emit(page_idx))
+
+        act_del = menu.addAction(f"🗑️ Excluir Página {page_idx + 1}")
+        act_del.triggered.connect(lambda: self.deletePageRequested.emit(page_idx))
+
+        menu.exec(event.globalPos())
 
     def load_document(self, doc):
         if self._worker and self._worker.isRunning():
@@ -143,6 +190,13 @@ class OutlineTreeWidget(QTreeWidget):
 class SidebarWidget(QWidget):
     """Painel lateral com abas para Miniaturas e Sumário"""
     pageSelected = pyqtSignal(int)
+    exportPagePdfRequested = pyqtSignal(int)
+    exportPageImageRequested = pyqtSignal(int)
+    splitPagesRequested = pyqtSignal()
+    importPdfRequested = pyqtSignal(int)
+    importImageRequested = pyqtSignal(int)
+    rotatePageRequested = pyqtSignal(int)
+    deletePageRequested = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -152,6 +206,13 @@ class SidebarWidget(QWidget):
         self.tabs = QTabWidget()
         self.thumbnail_list = ThumbnailListWidget()
         self.thumbnail_list.pageSelected.connect(self.pageSelected)
+        self.thumbnail_list.exportPagePdfRequested.connect(self.exportPagePdfRequested)
+        self.thumbnail_list.exportPageImageRequested.connect(self.exportPageImageRequested)
+        self.thumbnail_list.splitPagesRequested.connect(self.splitPagesRequested)
+        self.thumbnail_list.importPdfRequested.connect(self.importPdfRequested)
+        self.thumbnail_list.importImageRequested.connect(self.importImageRequested)
+        self.thumbnail_list.rotatePageRequested.connect(self.rotatePageRequested)
+        self.thumbnail_list.deletePageRequested.connect(self.deletePageRequested)
 
         self.outline_tree = OutlineTreeWidget()
         self.outline_tree.pageSelected.connect(self.pageSelected)

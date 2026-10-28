@@ -563,31 +563,209 @@ class PDFViewer(QScrollArea):
         except Exception as e:
             QMessageBox.critical(self, "Erro ao Inserir Imagem", f"Não foi possível inserir a imagem:\n{e}")
 
-    def delete_current_page(self):
-        """Gerenciamento de Páginas: Exclui a página ativa"""
+    def delete_specific_page(self, page_idx):
+        """Exclui a página especificada do documento"""
         if not self.doc or self.total_pages <= 1:
             QMessageBox.warning(self, "Aviso", "O documento precisa ter pelo menos uma página.")
             return False
 
-        self.doc.delete_page(self.current_page_idx)
-        self.total_pages = len(self.doc)
-        if self.current_page_idx >= self.total_pages:
-            self.current_page_idx = max(0, self.total_pages - 1)
+        if 0 <= page_idx < self.total_pages:
+            self.doc.delete_page(page_idx)
+            self.total_pages = len(self.doc)
+            if self.current_page_idx >= self.total_pages:
+                self.current_page_idx = max(0, self.total_pages - 1)
+            elif self.current_page_idx > page_idx:
+                self.current_page_idx -= 1
 
+            self.documentModified.emit()
+            self.render_current_page()
+            self.statusMessage.emit(f"Página {page_idx + 1} excluída. Total restante: {self.total_pages} página(s).")
+            return True
+        return False
+
+    def delete_current_page(self):
+        """Gerenciamento de Páginas: Exclui a página ativa"""
+        return self.delete_specific_page(self.current_page_idx)
+
+    def rotate_specific_page_permanent(self, page_idx, degrees=90):
+        """Gira e grava a nova orientação permanentemente para uma página específica"""
+        if not self.doc or page_idx < 0 or page_idx >= self.total_pages:
+            return False
+        target_page = self.doc.load_page(page_idx)
+        new_rot = (target_page.rotation + degrees) % 360
+        target_page.set_rotation(new_rot)
         self.documentModified.emit()
         self.render_current_page()
-        self.statusMessage.emit(f"Página excluída. Restam {self.total_pages} páginas.")
+        self.statusMessage.emit(f"Página {page_idx + 1} girada permanentemente para {new_rot}°.")
         return True
 
     def rotate_page_permanent(self, degrees=90):
         """Gira e grava a nova orientação permanentemente no PDF"""
-        if not self.current_page:
-            return
-        new_rot = (self.current_page.rotation + degrees) % 360
-        self.current_page.set_rotation(new_rot)
-        self.documentModified.emit()
-        self.render_current_page()
-        self.statusMessage.emit(f"Página girada permanentemente para {new_rot}°.")
+        self.rotate_specific_page_permanent(self.current_page_idx, degrees)
+
+    def export_page_as_pdf(self, page_idx, output_path):
+        """Exporta uma página específica como um novo arquivo PDF"""
+        return self.export_pages_as_pdf([page_idx], output_path)
+
+    def export_pages_as_pdf(self, page_indices, output_path):
+        """Exporta um conjunto de páginas para um único arquivo PDF consolidado"""
+        if not self.doc or not page_indices:
+            return False
+        try:
+            new_doc = pymupdf.open()
+            for pno in page_indices:
+                if 0 <= pno < self.total_pages:
+                    new_doc.insert_pdf(self.doc, from_page=pno, to_page=pno)
+            new_doc.save(output_path, garbage=3, deflate=True)
+            new_doc.close()
+            return True
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Exportar PDF", f"Falha ao exportar páginas para PDF:\n{e}")
+            return False
+
+    def split_pages_to_folder(self, page_indices, dest_dir, base_name="pagina"):
+        """Salva cada página selecionada como um arquivo individual em uma pasta"""
+        if not self.doc or not page_indices:
+            return 0
+        count = 0
+        try:
+            for pno in page_indices:
+                if 0 <= pno < self.total_pages:
+                    out_path = os.path.join(dest_dir, f"{base_name}_pag_{pno + 1:03d}.pdf")
+                    new_doc = pymupdf.open()
+                    new_doc.insert_pdf(self.doc, from_page=pno, to_page=pno)
+                    new_doc.save(out_path, garbage=3, deflate=True)
+                    new_doc.close()
+                    count += 1
+            return count
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Separar Páginas", f"Falha ao separar páginas individuais:\n{e}")
+            return count
+
+    def export_page_as_image(self, page_idx, output_path, dpi=200):
+        """Renderiza e salva uma página como arquivo de imagem"""
+        if not self.doc or page_idx < 0 or page_idx >= self.total_pages:
+            return False
+        try:
+            page = self.doc.load_page(page_idx)
+            scale = dpi / 72.0
+            matrix = pymupdf.Matrix(scale, scale)
+            pix = page.get_pixmap(matrix=matrix, alpha=False)
+            pix.save(output_path)
+            return True
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Exportar Imagem", f"Falha ao exportar imagem da página:\n{e}")
+            return False
+
+    def export_pages_as_images(self, page_indices, dest_dir, base_name="pagina", img_format="png", dpi=200):
+        """Renderiza e salva múltiplas páginas como arquivos de imagem em uma pasta"""
+        if not self.doc or not page_indices:
+            return 0
+        count = 0
+        scale = dpi / 72.0
+        matrix = pymupdf.Matrix(scale, scale)
+        try:
+            for pno in page_indices:
+                if 0 <= pno < self.total_pages:
+                    out_path = os.path.join(dest_dir, f"{base_name}_pag_{pno + 1:03d}.{img_format}")
+                    page = self.doc.load_page(pno)
+                    pix = page.get_pixmap(matrix=matrix, alpha=False)
+                    pix.save(out_path)
+                    count += 1
+            return count
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Exportar Imagens", f"Falha ao exportar imagens:\n{e}")
+            return count
+
+    def insert_pdf_pages(self, src_pdf_path, insert_at_idx, pages_to_insert=None):
+        """Importa e insere páginas de outro arquivo PDF no documento ativo"""
+        if not os.path.exists(src_pdf_path):
+            return False
+        if not self.doc:
+            self.doc = pymupdf.open()
+            self.total_pages = 0
+
+        try:
+            src_doc = pymupdf.open(src_pdf_path)
+            src_len = len(src_doc)
+            if src_len == 0:
+                src_doc.close()
+                return False
+
+            insert_pos = max(0, min(insert_at_idx, self.total_pages))
+            if pages_to_insert is None:
+                self.doc.insert_pdf(src_doc, from_page=0, to_page=src_len - 1, start_at=insert_pos)
+            else:
+                cur_pos = insert_pos
+                for pno in pages_to_insert:
+                    if 0 <= pno < src_len:
+                        self.doc.insert_pdf(src_doc, from_page=pno, to_page=pno, start_at=cur_pos)
+                        cur_pos += 1
+
+            src_doc.close()
+            self.total_pages = len(self.doc)
+            self.current_page_idx = insert_pos
+            self.documentModified.emit()
+            self.render_current_page()
+            self.statusMessage.emit(f"Páginas importadas com sucesso! Total: {self.total_pages} página(s).")
+            return True
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Importar PDF", f"Falha ao importar páginas do PDF:\n{e}")
+            return False
+
+    def insert_image_pages(self, image_paths, insert_at_idx, fit_to_a4=True):
+        """Importa uma ou mais imagens como novas páginas no documento"""
+        if not image_paths:
+            return False
+        if not self.doc:
+            self.doc = pymupdf.open()
+            self.total_pages = 0
+
+        insert_pos = max(0, min(insert_at_idx, self.total_pages))
+        cur_pos = insert_pos
+        inserted_count = 0
+
+        try:
+            for img_path in image_paths:
+                if not os.path.exists(img_path):
+                    continue
+                pix = pymupdf.Pixmap(img_path)
+                img_w, img_h = pix.width, pix.height
+                pix = None
+
+                if fit_to_a4:
+                    if img_w > img_h:
+                        page_w, page_h = 841.89, 595.28
+                    else:
+                        page_w, page_h = 595.28, 841.89
+
+                    margin = 20.0
+                    avail_w = page_w - (2 * margin)
+                    avail_h = page_h - (2 * margin)
+                    scale = min(avail_w / img_w, avail_h / img_h)
+                    dest_w = img_w * scale
+                    dest_h = img_h * scale
+                    dest_x = margin + (avail_w - dest_w) / 2
+                    dest_y = margin + (avail_h - dest_h) / 2
+                    rect = pymupdf.Rect(dest_x, dest_y, dest_x + dest_w, dest_y + dest_h)
+                else:
+                    page_w, page_h = float(img_w), float(img_h)
+                    rect = pymupdf.Rect(0, 0, page_w, page_h)
+
+                page = self.doc.new_page(pno=cur_pos, width=page_w, height=page_h)
+                page.insert_image(rect, filename=img_path)
+                cur_pos += 1
+                inserted_count += 1
+
+            self.total_pages = len(self.doc)
+            self.current_page_idx = insert_pos
+            self.documentModified.emit()
+            self.render_current_page()
+            self.statusMessage.emit(f"{inserted_count} página(s) de imagem inserida(s). Total: {self.total_pages} página(s).")
+            return True
+        except Exception as e:
+            QMessageBox.critical(self, "Erro ao Inserir Imagem como Página", f"Falha ao inserir imagens:\n{e}")
+            return False
 
     # --- Navegação e Zoom ---
 

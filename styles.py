@@ -160,12 +160,17 @@ QTabWidget::pane {
 QTabBar::tab {
     background: #e2e8f0;
     border: 1px solid #cbd5e1;
-    padding: 8px 16px;
+    padding: 7px 16px;
     margin-right: 2px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
     color: #334155;
     font-weight: 600;
+}
+
+QTabBar::tab:hover {
+    background: #cbd5e1;
+    color: #0f172a;
 }
 
 QTabBar::tab:selected {
@@ -173,6 +178,31 @@ QTabBar::tab:selected {
     border-bottom-color: #ffffff;
     color: #2563eb;
     font-weight: bold;
+}
+
+QTabBar::close-button {
+    subcontrol-position: right;
+    margin-left: 6px;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+QTabBar::close-button:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+QTabWidget QToolButton {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: bold;
+}
+
+QTabWidget QToolButton:hover {
+    background-color: #e2e8f0;
+    color: #2563eb;
 }
 
 QTreeWidget, QListWidget {
@@ -409,12 +439,17 @@ QTabWidget::pane {
 QTabBar::tab {
     background: #111827;
     border: 1px solid #374151;
-    padding: 8px 16px;
+    padding: 7px 16px;
     margin-right: 2px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
     color: #94a3b8;
     font-weight: 600;
+}
+
+QTabBar::tab:hover {
+    background: #1f2937;
+    color: #f8fafc;
 }
 
 QTabBar::tab:selected {
@@ -422,6 +457,32 @@ QTabBar::tab:selected {
     border-bottom-color: #1f2937;
     color: #60a5fa;
     font-weight: bold;
+}
+
+QTabBar::close-button {
+    subcontrol-position: right;
+    margin-left: 6px;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+QTabBar::close-button:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+QTabWidget QToolButton {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #f8fafc;
+    font-weight: bold;
+}
+
+QTabWidget QToolButton:hover {
+    background-color: #374151;
+    color: #60a5fa;
 }
 
 QTreeWidget, QListWidget {
