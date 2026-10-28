@@ -18,11 +18,14 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QFileDialog, QMessageBox,
     QSplitter, QVBoxLayout, QWidget, QToolBar, QComboBox,
     QSpinBox, QLabel, QPushButton, QMenu, QToolButton,
-    QTabWidget, QStackedWidget
+    QTabWidget, QTabBar, QStackedWidget
 )
 from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 
-from styles import LIGHT_THEME, DARK_THEME, SEARCH_BAR_STYLE, SEARCH_BAR_DARK_STYLE
+from styles import (
+    LIGHT_THEME, DARK_THEME, SEARCH_BAR_STYLE, SEARCH_BAR_DARK_STYLE,
+    get_light_theme, get_dark_theme
+)
 from pdf_viewer import PDFViewer
 from thumbnails import SidebarWidget
 from search_widget import SearchBar
@@ -180,8 +183,11 @@ class PDFReaderMainWindow(QMainWindow):
 
         # Botão '+' na barra de abas
         self.btn_new_tab = QToolButton(self.tab_widget)
-        self.btn_new_tab.setText(" ＋ ")
+        self.btn_new_tab.setText("+")
         self.btn_new_tab.setToolTip("Abrir documento em nova aba (Ctrl+T)")
+        self.btn_new_tab.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
+        self.btn_new_tab.setFixedSize(28, 28)
+        self.btn_new_tab.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.btn_new_tab.clicked.connect(self.prompt_open_file)
         self.tab_widget.setCornerWidget(self.btn_new_tab, Qt.Corner.TopRightCorner)
 
@@ -427,8 +433,8 @@ class PDFReaderMainWindow(QMainWindow):
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
-        # Nova Aba e Abrir
-        btn_new_tab = QAction("➕ Nova Aba", self)
+        # Nova Aba, Abrir, Salvar, Imprimir
+        btn_new_tab = QAction("➕ Aba", self)
         btn_new_tab.setToolTip("Abrir documento em nova aba (Ctrl+T)")
         btn_new_tab.triggered.connect(self.prompt_open_file)
         toolbar.addAction(btn_new_tab)
@@ -443,47 +449,15 @@ class PDFReaderMainWindow(QMainWindow):
         self.btn_save.triggered.connect(self.save_document)
         toolbar.addAction(self.btn_save)
 
-        btn_print = QAction("🖨️ Imprimir", self)
+        btn_print = QAction("🖨️", self)
         btn_print.setToolTip("Imprimir documento (Ctrl+P)")
         btn_print.triggered.connect(self.print_document)
         toolbar.addAction(btn_print)
 
         toolbar.addSeparator()
 
-        # Importar (PDF ou Imagem)
-        btn_import_menu = QMenu(self)
-        act_imp_pdf_tb = btn_import_menu.addAction("➕ Importar Páginas de Arquivo PDF...")
-        act_imp_pdf_tb.triggered.connect(lambda: self.prompt_import_pdf())
-        act_imp_img_tb = btn_import_menu.addAction("🖼️ Importar Imagem como Nova Página...")
-        act_imp_img_tb.triggered.connect(lambda: self.prompt_import_image())
-
-        self.btn_import_tool = QToolButton(self)
-        self.btn_import_tool.setText("➕ Importar")
-        self.btn_import_tool.setToolTip("Importar páginas de outro PDF ou arquivo de imagem")
-        self.btn_import_tool.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        self.btn_import_tool.setMenu(btn_import_menu)
-        toolbar.addWidget(self.btn_import_tool)
-
-        # Exportar / Separar Páginas
-        btn_export_menu = QMenu(self)
-        act_exp_pdf_tb = btn_export_menu.addAction("📤 Exportar Página Atual como PDF...")
-        act_exp_pdf_tb.triggered.connect(lambda: self.prompt_export_page_pdf())
-        act_exp_img_tb = btn_export_menu.addAction("🖼️ Exportar Página Atual como Imagem...")
-        act_exp_img_tb.triggered.connect(lambda: self.prompt_export_page_image())
-        act_split_tb = btn_export_menu.addAction("✂️ Separar / Dividir Páginas...")
-        act_split_tb.triggered.connect(self.prompt_split_pages)
-
-        self.btn_export_tool = QToolButton(self)
-        self.btn_export_tool.setText("✂️ Separar/Exportar")
-        self.btn_export_tool.setToolTip("Separar páginas, exportar página atual ou dividir documento")
-        self.btn_export_tool.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        self.btn_export_tool.setMenu(btn_export_menu)
-        toolbar.addWidget(self.btn_export_tool)
-
-        toolbar.addSeparator()
-
         # Alternar Painel
-        self.btn_sidebar = QAction("📑 Painel", self)
+        self.btn_sidebar = QAction("📑", self)
         self.btn_sidebar.setToolTip("Mostrar/Ocultar painel de miniaturas (F4)")
         self.btn_sidebar.setCheckable(True)
         self.btn_sidebar.setChecked(True)
@@ -506,12 +480,12 @@ class PDFReaderMainWindow(QMainWindow):
         self.spin_page = QSpinBox()
         self.spin_page.setMinimum(1)
         self.spin_page.setMaximum(1)
-        self.spin_page.setFixedWidth(55)
+        self.spin_page.setFixedWidth(50)
         self.spin_page.valueChanged.connect(lambda val: self.viewer.go_to_page(val - 1) if self.viewer else None)
         toolbar.addWidget(self.spin_page)
 
         self.lbl_total_pages = QLabel(" / 0 ")
-        self.lbl_total_pages.setStyleSheet("font-weight: bold; margin-right: 5px;")
+        self.lbl_total_pages.setStyleSheet("font-weight: bold; margin-right: 4px;")
         toolbar.addWidget(self.lbl_total_pages)
 
         btn_next = QAction("▶", self)
@@ -534,7 +508,7 @@ class PDFReaderMainWindow(QMainWindow):
 
         self.combo_zoom = QComboBox()
         self.combo_zoom.setEditable(False)
-        self.combo_zoom.setFixedWidth(100)
+        self.combo_zoom.setFixedWidth(88)
         self.combo_zoom.addItems([
             "50%", "75%", "100%", "125%", "150%", "200%", "300%", 
             "Ajustar Largura", "Ajustar Página"
@@ -560,19 +534,6 @@ class PDFReaderMainWindow(QMainWindow):
 
         toolbar.addSeparator()
 
-        # Rotação de Visualização
-        btn_rot_ccw = QAction("↺", self)
-        btn_rot_ccw.setToolTip("Girar à Esquerda (Ctrl+Shift+R)")
-        btn_rot_ccw.triggered.connect(lambda: self.viewer.rotate_counter_clockwise() if self.viewer else None)
-        toolbar.addAction(btn_rot_ccw)
-
-        btn_rot_cw = QAction("↻", self)
-        btn_rot_cw.setToolTip("Girar à Direita (Ctrl+R)")
-        btn_rot_cw.triggered.connect(lambda: self.viewer.rotate_clockwise() if self.viewer else None)
-        toolbar.addAction(btn_rot_cw)
-
-        toolbar.addSeparator()
-
         # Busca
         btn_search = QAction("🔍 Localizar", self)
         btn_search.setToolTip("Pesquisar no texto (Ctrl+F)")
@@ -581,14 +542,15 @@ class PDFReaderMainWindow(QMainWindow):
 
         # Seletor Rápido de Tema
         self.combo_theme = QComboBox()
-        self.combo_theme.setFixedWidth(115)
+        self.combo_theme.setFixedWidth(98)
         self.combo_theme.addItems(["☀️ Claro", "🌙 Escuro", "📜 Sépia"])
         self.combo_theme.currentIndexChanged.connect(self._on_quick_theme_changed)
         toolbar.addWidget(self.combo_theme)
 
     def _create_edit_toolbar(self):
-        """Barra de Ferramentas Dedicada à Edição do PDF"""
-        edit_toolbar = QToolBar("Ferramentas de Edição", self)
+        """Barra de Ferramentas Dedicada à Edição do PDF e Gerenciamento de Páginas"""
+        self.addToolBarBreak()
+        edit_toolbar = QToolBar("Ferramentas de Edição e Páginas", self)
         edit_toolbar.setMovable(False)
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, edit_toolbar)
 
@@ -604,29 +566,29 @@ class PDFReaderMainWindow(QMainWindow):
         tool_group.addAction(self.act_tool_select)
         edit_toolbar.addAction(self.act_tool_select)
 
-        self.act_tool_add_text = QAction("✍️ Adicionar Texto", self)
-        self.act_tool_add_text.setToolTip("Clique em qualquer lugar da página para inserir texto")
+        self.act_tool_add_text = QAction("✍️ Texto", self)
+        self.act_tool_add_text.setToolTip("Adicionar texto: Clique em qualquer lugar da página para inserir texto")
         self.act_tool_add_text.setCheckable(True)
         self.act_tool_add_text.triggered.connect(lambda: self._set_active_tool("add_text"))
         tool_group.addAction(self.act_tool_add_text)
         edit_toolbar.addAction(self.act_tool_add_text)
 
-        self.act_tool_eraser = QAction("🧹 Borracha / Apagar", self)
-        self.act_tool_eraser.setToolTip("Arraste um retângulo sobre o conteúdo para apagá-lo")
+        self.act_tool_eraser = QAction("🧹 Borracha", self)
+        self.act_tool_eraser.setToolTip("Borracha: Arraste um retângulo sobre o conteúdo para apagá-lo")
         self.act_tool_eraser.setCheckable(True)
         self.act_tool_eraser.triggered.connect(lambda: self._set_active_tool("eraser"))
         tool_group.addAction(self.act_tool_eraser)
         edit_toolbar.addAction(self.act_tool_eraser)
 
-        self.act_tool_highlight = QAction("🖍️ Marca-Texto", self)
-        self.act_tool_highlight.setToolTip("Arraste sobre um trecho para destacar em amarelo")
+        self.act_tool_highlight = QAction("🖍️ Realçar", self)
+        self.act_tool_highlight.setToolTip("Marca-texto: Arraste sobre um trecho para destacar em amarelo")
         self.act_tool_highlight.setCheckable(True)
         self.act_tool_highlight.triggered.connect(lambda: self._set_active_tool("highlight"))
         tool_group.addAction(self.act_tool_highlight)
         edit_toolbar.addAction(self.act_tool_highlight)
 
-        self.act_tool_sig = QAction("✒️ Inserir Assinatura/Imagem", self)
-        self.act_tool_sig.setToolTip("Clique na folha para inserir uma imagem ou carimbo de assinatura")
+        self.act_tool_sig = QAction("✒️ Assinatura", self)
+        self.act_tool_sig.setToolTip("Assinatura: Clique na folha para inserir imagem ou carimbo de assinatura")
         self.act_tool_sig.setCheckable(True)
         self.act_tool_sig.triggered.connect(lambda: self._set_active_tool("insert_image"))
         tool_group.addAction(self.act_tool_sig)
@@ -634,28 +596,55 @@ class PDFReaderMainWindow(QMainWindow):
 
         edit_toolbar.addSeparator()
 
-        # Ações de Página
-        act_del_page = QAction("🗑️ Excluir Página", self)
-        act_del_page.setToolTip("Excluir permanentemente a página atual do documento")
-        act_del_page.triggered.connect(self._prompt_delete_page)
-        edit_toolbar.addAction(act_del_page)
+        # Operações de Página
+        act_split_page = QAction("✂️ Separar", self)
+        act_split_page.setToolTip("Separar páginas em arquivos individuais, extrair intervalo ou exportar como imagem")
+        act_split_page.triggered.connect(self.prompt_split_pages)
+        edit_toolbar.addAction(act_split_page)
 
-        act_rot_perm = QAction("↻ Girar Página Permanente", self)
-        act_rot_perm.setToolTip("Girar e salvar a orientação da página no arquivo")
+        # Exportar Página (Menu com PDF e Imagem)
+        btn_export_menu = QMenu(self)
+        act_exp_pdf = btn_export_menu.addAction("📄 Exportar Página Atual como PDF...")
+        act_exp_pdf.triggered.connect(lambda: self.prompt_export_page_pdf())
+        act_exp_img = btn_export_menu.addAction("🖼️ Exportar Página Atual como Imagem...")
+        act_exp_img.triggered.connect(lambda: self.prompt_export_page_image())
+
+        self.btn_export_tool = QToolButton(self)
+        self.btn_export_tool.setText("📤 Exportar")
+        self.btn_export_tool.setToolTip("Exportar página atual como PDF ou imagem")
+        self.btn_export_tool.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.btn_export_tool.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        self.btn_export_tool.setMenu(btn_export_menu)
+        edit_toolbar.addWidget(self.btn_export_tool)
+
+        # Importar Páginas / Imagens (Menu com PDF e Imagem)
+        btn_import_menu = QMenu(self)
+        act_imp_pdf = btn_import_menu.addAction("📄 Importar Páginas de Arquivo PDF...")
+        act_imp_pdf.triggered.connect(lambda: self.prompt_import_pdf())
+        act_imp_img = btn_import_menu.addAction("🖼️ Importar Imagens como Novas Páginas...")
+        act_imp_img.triggered.connect(lambda: self.prompt_import_image())
+
+        self.btn_import_tool = QToolButton(self)
+        self.btn_import_tool.setText("➕ Importar")
+        self.btn_import_tool.setToolTip("Importar páginas de outro PDF ou arquivo de imagem")
+        self.btn_import_tool.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.btn_import_tool.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        self.btn_import_tool.setMenu(btn_import_menu)
+        edit_toolbar.addWidget(self.btn_import_tool)
+
+        edit_toolbar.addSeparator()
+
+        act_rot_perm = QAction("↻ Girar Página", self)
+        act_rot_perm.setToolTip("Girar e salvar permanentemente a orientação da página no PDF")
         act_rot_perm.triggered.connect(self._prompt_rotate_page_perm)
         edit_toolbar.addAction(act_rot_perm)
 
         edit_toolbar.addSeparator()
 
-        act_split_page = QAction("✂️ Separar Páginas", self)
-        act_split_page.setToolTip("Separar ou extrair páginas do documento atual")
-        act_split_page.triggered.connect(self.prompt_split_pages)
-        edit_toolbar.addAction(act_split_page)
-
-        act_import_page = QAction("➕ Importar Páginas/Imagens", self)
-        act_import_page.setToolTip("Importar páginas de outro PDF ou imagem como nova página")
-        act_import_page.triggered.connect(lambda: self.prompt_import_pdf())
-        edit_toolbar.addAction(act_import_page)
+        act_del_page = QAction("🗑️ Excluir", self)
+        act_del_page.setToolTip("Excluir permanentemente a página atual do documento")
+        act_del_page.triggered.connect(self._prompt_delete_page)
+        edit_toolbar.addAction(act_del_page)
 
     def _set_active_tool(self, tool_name):
         self.active_tool_name = tool_name
@@ -719,6 +708,7 @@ class PDFReaderMainWindow(QMainWindow):
 
         idx = self.tab_widget.addTab(tab, tab.display_title)
         self.tab_widget.setTabToolTip(idx, abs_path)
+        self._setup_tab_close_button(idx)
         if switch_to:
             self.tab_widget.setCurrentIndex(idx)
             self.stack.setCurrentWidget(self.tab_widget)
@@ -743,6 +733,7 @@ class PDFReaderMainWindow(QMainWindow):
             tab.viewer.set_tool(self.active_tool_name)
 
         idx = self.tab_widget.addTab(tab, tab.display_title)
+        self._setup_tab_close_button(idx)
         self.tab_widget.setCurrentIndex(idx)
         self.stack.setCurrentWidget(self.tab_widget)
         self._update_window_title()
@@ -889,6 +880,7 @@ class PDFReaderMainWindow(QMainWindow):
             new_tab.viewer.go_to_page(tab.viewer.current_page_idx)
             idx = self.tab_widget.addTab(new_tab, f"{new_tab.display_title} (Cópia)")
             self.tab_widget.setTabToolTip(idx, tab.file_path)
+            self._setup_tab_close_button(idx)
             self.tab_widget.setCurrentIndex(idx)
 
     def _open_file_folder(self, file_path):
@@ -995,6 +987,18 @@ class PDFReaderMainWindow(QMainWindow):
         self._update_tab_title(tab)
         if tab == self.current_tab:
             self._update_window_title()
+
+    def _setup_tab_close_button(self, idx):
+        bar = self.tab_widget.tabBar()
+        btn = bar.tabButton(idx, QTabBar.ButtonPosition.RightSide)
+        if btn:
+            theme_name = self.config.get("theme", "light")
+            icon_file = "close_tab_dark.svg" if theme_name == "dark" else "close_tab_light.svg"
+            icon_path = get_resource_path(os.path.join("icons", icon_file))
+            if os.path.exists(icon_path):
+                btn.setIcon(QIcon(icon_path))
+            btn.setToolTip("Fechar Aba (Ctrl+W)")
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def _update_tab_title(self, tab):
         idx = self.tab_widget.indexOf(tab)
@@ -1364,29 +1368,30 @@ class PDFReaderMainWindow(QMainWindow):
         self._save_config()
 
         if theme_name == "dark":
-            self.setStyleSheet(DARK_THEME)
+            self.setStyleSheet(get_dark_theme())
             self.search_bar.setStyleSheet(SEARCH_BAR_DARK_STYLE)
             self.combo_theme.blockSignals(True)
             self.combo_theme.setCurrentIndex(1)
             self.combo_theme.blockSignals(False)
         elif theme_name == "sepia":
-            self.setStyleSheet(LIGHT_THEME)
+            self.setStyleSheet(get_light_theme())
             self.search_bar.setStyleSheet(SEARCH_BAR_STYLE)
             self.combo_theme.blockSignals(True)
             self.combo_theme.setCurrentIndex(2)
             self.combo_theme.blockSignals(False)
         else:  # light
-            self.setStyleSheet(LIGHT_THEME)
+            self.setStyleSheet(get_light_theme())
             self.search_bar.setStyleSheet(SEARCH_BAR_STYLE)
             self.combo_theme.blockSignals(True)
             self.combo_theme.setCurrentIndex(0)
             self.combo_theme.blockSignals(False)
 
-        # Atualiza todas as abas abertas
+        # Atualiza todas as abas abertas e seus botões de fechar
         for i in range(self.tab_widget.count()):
             tab = self.tab_widget.widget(i)
             if isinstance(tab, DocumentTab):
                 self._apply_theme_to_tab(tab)
+            self._setup_tab_close_button(i)
 
     # Suporte a Arrastar e Soltar (Drag & Drop)
     def dragEnterEvent(self, event):
