@@ -143,12 +143,12 @@ class WelcomePlaceholderWidget(QWidget):
         layout.addWidget(icon_label)
 
         title = QLabel("Leitor e Editor de PDF")
-        title.setStyleSheet("font-size: 22px; font-weight: bold; color: #1e3a8a;")
+        title.setObjectName("welcomeTitle")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
         subtitle = QLabel("Abra múltiplos arquivos PDF em abas para leitura, anotação e edição rápida.")
-        subtitle.setStyleSheet("font-size: 13px; color: #64748b; margin-bottom: 10px;")
+        subtitle.setObjectName("welcomeSubtitle")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtitle)
 
@@ -158,46 +158,19 @@ class WelcomePlaceholderWidget(QWidget):
 
         btn_open = QPushButton("📂 Abrir Arquivo PDF...")
         btn_open.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_open.setStyleSheet("""
-            QPushButton {
-                background-color: #2563eb;
-                color: white;
-                font-weight: bold;
-                font-size: 13px;
-                padding: 9px 20px;
-                border-radius: 6px;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #1d4ed8;
-            }
-        """)
+        btn_open.setObjectName("primaryButton")
         btn_open.clicked.connect(self.openRequested.emit)
         btn_box.addWidget(btn_open)
 
         btn_img = QPushButton("🖼️ Criar a partir de Imagens...")
         btn_img.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_img.setStyleSheet("""
-            QPushButton {
-                background-color: #ffffff;
-                color: #1e293b;
-                border: 1px solid #cbd5e1;
-                font-weight: 600;
-                font-size: 13px;
-                padding: 9px 18px;
-                border-radius: 6px;
-            }
-            QPushButton:hover {
-                background-color: #f1f5f9;
-                border-color: #94a3b8;
-            }
-        """)
+        btn_img.setObjectName("secondaryButton")
         btn_img.clicked.connect(self.createFromImagesRequested.emit)
         btn_box.addWidget(btn_img)
 
         layout.addLayout(btn_box)
 
         hint = QLabel("💡 Dica: Você também pode arrastar e soltar múltiplos arquivos PDF diretamente aqui.")
-        hint.setStyleSheet("font-size: 12px; color: #94a3b8; margin-top: 15px;")
+        hint.setObjectName("welcomeHint")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(hint)

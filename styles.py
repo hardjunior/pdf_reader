@@ -271,6 +271,129 @@ QPushButton:pressed {{
     background-color: #cbd5e1;
 }}
 
+QPushButton#primaryButton {{
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: bold;
+    border: 1px solid #1d4ed8;
+    padding: 6px 16px;
+    border-radius: 4px;
+}}
+
+QPushButton#primaryButton:hover {{
+    background-color: #1d4ed8;
+}}
+
+QPushButton#secondaryButton {{
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 4px;
+}}
+
+QPushButton#secondaryButton:hover {{
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}}
+
+/* Diálogos e Modais (Tema Claro) */
+QDialog {{
+    background-color: #f8fafc;
+    color: #0f172a;
+}}
+
+QGroupBox {{
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    margin-top: 14px;
+    padding-top: 14px;
+    font-weight: bold;
+    color: #1e3a8a;
+    background-color: #ffffff;
+}}
+
+QGroupBox::title {{
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 6px;
+    color: #1e3a8a;
+}}
+
+QRadioButton, QCheckBox {{
+    color: #0f172a;
+    font-size: 13px;
+    spacing: 8px;
+}}
+
+QRadioButton::indicator {{
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 8px;
+    background: #ffffff;
+}}
+
+QRadioButton::indicator:hover {{
+    border-color: #2563eb;
+}}
+
+QRadioButton::indicator:checked {{
+    border-color: #2563eb;
+    background-color: #2563eb;
+}}
+
+QLabel#dialogHeader {{
+    color: #1e3a8a;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}}
+
+QLabel#dialogSubHeader {{
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+}}
+
+QLabel#dialogHint {{
+    color: #64748b;
+    font-size: 11px;
+}}
+
+QLabel#dialogFieldLabel {{
+    font-weight: bold;
+    color: #475569;
+}}
+
+QLabel#dialogCard {{
+    background-color: #f8fafc;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}}
+
+QLabel#welcomeTitle {{
+    font-size: 22px;
+    font-weight: bold;
+    color: #1e3a8a;
+}}
+
+QLabel#welcomeSubtitle {{
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 10px;
+}}
+
+QLabel#welcomeHint {{
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 15px;
+}}
+
 /* Barras de Rolagem */
 QScrollBar:vertical, QScrollBar:horizontal {{
     border: none;
@@ -564,6 +687,131 @@ QPushButton:hover {{
 
 QPushButton:pressed {{
     background-color: #0f172a;
+}}
+
+QPushButton#primaryButton {{
+    background-color: #0284c7;
+    color: #ffffff;
+    font-weight: bold;
+    border: 1px solid #38bdf8;
+    padding: 6px 16px;
+    border-radius: 4px;
+}}
+
+QPushButton#primaryButton:hover {{
+    background-color: #0369a1;
+}}
+
+QPushButton#secondaryButton {{
+    background-color: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 4px;
+}}
+
+QPushButton#secondaryButton:hover {{
+    background-color: #334155;
+    border-color: #64748b;
+}}
+
+/* Diálogos e Modais de Alto Contraste (Tema Escuro) */
+QDialog {{
+    background-color: #0f172a;
+    color: #f8fafc;
+}}
+
+QGroupBox {{
+    border: 1.5px solid #334155;
+    border-radius: 6px;
+    margin-top: 14px;
+    padding-top: 14px;
+    font-weight: bold;
+    color: #38bdf8; /* Cyan vibrante de altíssimo contraste */
+    background-color: #1e293b;
+}}
+
+QGroupBox::title {{
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 6px;
+    color: #38bdf8;
+    background-color: #1e293b;
+    border-radius: 3px;
+}}
+
+QRadioButton, QCheckBox {{
+    color: #f8fafc;
+    font-size: 13px;
+    spacing: 8px;
+}}
+
+QRadioButton::indicator {{
+    width: 15px;
+    height: 15px;
+    border: 2px solid #64748b;
+    border-radius: 8px;
+    background: #0f172a;
+}}
+
+QRadioButton::indicator:hover {{
+    border-color: #38bdf8;
+}}
+
+QRadioButton::indicator:checked {{
+    border-color: #38bdf8;
+    background-color: #0284c7;
+}}
+
+QLabel#dialogHeader {{
+    color: #38bdf8; /* Azul claro / ciano vibrante: NÍTIDO contra o preto */
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}}
+
+QLabel#dialogSubHeader {{
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 600;
+}}
+
+QLabel#dialogHint {{
+    color: #cbd5e1; /* Prata claro legível */
+    font-size: 11px;
+}}
+
+QLabel#dialogFieldLabel {{
+    font-weight: bold;
+    color: #38bdf8;
+}}
+
+QLabel#dialogCard {{
+    background-color: #1e293b;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    color: #f8fafc;
+}}
+
+QLabel#welcomeTitle {{
+    font-size: 22px;
+    font-weight: bold;
+    color: #38bdf8;
+}}
+
+QLabel#welcomeSubtitle {{
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+}}
+
+QLabel#welcomeHint {{
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 15px;
 }}
 
 /* Barras de Rolagem */

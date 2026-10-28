@@ -50,7 +50,7 @@ class PropertiesDialog(QDialog):
 
         for row, (label, val) in enumerate(info_grid):
             lbl = QLabel(label)
-            lbl.setStyleSheet("font-weight: bold; color: #4b5563;")
+            lbl.setObjectName("dialogFieldLabel")
             val_lbl = QLabel(val)
             val_lbl.setWordWrap(True)
             val_lbl.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -64,6 +64,7 @@ class PropertiesDialog(QDialog):
         btn_box = QHBoxLayout()
         btn_box.addStretch()
         btn_ok = QPushButton("OK")
+        btn_ok.setObjectName("primaryButton")
         btn_ok.setFixedWidth(90)
         btn_ok.clicked.connect(self.accept)
         btn_box.addWidget(btn_ok)
@@ -81,7 +82,7 @@ class AboutDialog(QDialog):
         layout = QVBoxLayout(self)
 
         title = QLabel("📄 Leitor de PDF Python")
-        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #1e3a8a; margin-top: 10px;")
+        title.setObjectName("dialogHeader")
         layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignCenter)
 
         desc = QLabel(
@@ -89,7 +90,7 @@ class AboutDialog(QDialog):
             "Desenvolvido com PyQt6 e PyMuPDF (fitz) de alto desempenho."
         )
         desc.setWordWrap(True)
-        desc.setStyleSheet("color: #4b5563; text-align: center; margin: 10px 0;")
+        desc.setObjectName("dialogSubHeader")
         layout.addWidget(desc, alignment=Qt.AlignmentFlag.AlignCenter)
 
         shortcuts = QLabel(
@@ -102,7 +103,7 @@ class AboutDialog(QDialog):
             "• <b>F4</b>: Alternar painel lateral<br>"
             "• <b>F11</b>: Alternar tela cheia"
         )
-        shortcuts.setStyleSheet("background-color: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;")
+        shortcuts.setObjectName("dialogCard")
         layout.addWidget(shortcuts)
 
         btn_box = QHBoxLayout()
@@ -141,7 +142,7 @@ class TextEditDialog(QDialog):
         layout = QVBoxLayout(self)
 
         lbl_instruct = QLabel("Digite o texto a ser inserido/modificado:")
-        lbl_instruct.setStyleSheet("font-weight: bold; color: #1e293b;")
+        lbl_instruct.setObjectName("dialogSubHeader")
         layout.addWidget(lbl_instruct)
 
         from PyQt6.QtWidgets import QTextEdit, QSpinBox, QComboBox, QFormLayout
@@ -183,7 +184,7 @@ class TextEditDialog(QDialog):
         btn_box.addWidget(self.btn_cancel)
 
         self.btn_ok = QPushButton("Aplicar Texto" if is_edit else "Inserir Texto")
-        self.btn_ok.setStyleSheet("background-color: #2563eb; color: white; font-weight: bold; padding: 6px 14px;")
+        self.btn_ok.setObjectName("primaryButton")
         self.btn_ok.clicked.connect(self._on_accept)
         btn_box.addWidget(self.btn_ok)
 
@@ -271,12 +272,12 @@ class SplitPagesDialog(QDialog):
         layout.setSpacing(12)
 
         header = QLabel("✂️ Separar ou Exportar Páginas")
-        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 2px;")
+        header.setObjectName("dialogHeader")
         layout.addWidget(header)
 
         # Grupo 1: Seleção de Páginas
         grp_pages = QGroupBox("1. Selecione as Páginas")
-        grp_pages.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_pages estilizado pelo tema
         vbox_pages = QVBoxLayout(grp_pages)
         vbox_pages.setSpacing(8)
 
@@ -293,7 +294,7 @@ class SplitPagesDialog(QDialog):
         self.txt_range.setPlaceholderText(f"Ex: 1-3, 5 (1 a {total_pages})")
         self.txt_range.setEnabled(False)
         self.lbl_range_hint = QLabel(f"Total: {total_pages} páginas")
-        self.lbl_range_hint.setStyleSheet("color: #64748b; font-size: 11px;")
+        self.lbl_range_hint.setObjectName("dialogHint")
         h_range.addWidget(self.txt_range)
         h_range.addWidget(self.lbl_range_hint)
         vbox_pages.addLayout(h_range)
@@ -311,7 +312,7 @@ class SplitPagesDialog(QDialog):
 
         # Grupo 2: Formato e Modo de Saída
         grp_mode = QGroupBox("2. Formato e Modo de Exportação")
-        grp_mode.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_mode estilizado pelo tema
         vbox_mode = QVBoxLayout(grp_mode)
         vbox_mode.setSpacing(8)
 
@@ -364,7 +365,7 @@ class SplitPagesDialog(QDialog):
         btn_box.addWidget(self.btn_cancel)
 
         self.btn_export = QPushButton("Exportar...")
-        self.btn_export.setStyleSheet("background-color: #2563eb; color: white; font-weight: bold; padding: 6px 16px; border-radius: 4px;")
+        self.btn_export.setObjectName("primaryButton")
         self.btn_export.clicked.connect(self._on_accept)
         btn_box.addWidget(self.btn_export)
 
@@ -428,12 +429,12 @@ class ImportPdfDialog(QDialog):
         layout.setSpacing(12)
 
         header = QLabel("➕ Importar Páginas de Arquivo PDF")
-        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 2px;")
+        header.setObjectName("dialogHeader")
         layout.addWidget(header)
 
         # 1. Arquivo de Origem
         grp_file = QGroupBox("1. Selecione o Arquivo PDF")
-        grp_file.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_file estilizado pelo tema
         vbox_file = QVBoxLayout(grp_file)
 
         h_file = QHBoxLayout()
@@ -448,14 +449,14 @@ class ImportPdfDialog(QDialog):
         vbox_file.addLayout(h_file)
 
         self.lbl_src_info = QLabel("Nenhum arquivo selecionado.")
-        self.lbl_src_info.setStyleSheet("color: #64748b; font-size: 12px;")
+        self.lbl_src_info.setObjectName("dialogHint")
         vbox_file.addWidget(self.lbl_src_info)
 
         layout.addWidget(grp_file)
 
         # 2. Páginas a Importar
         self.grp_src_pages = QGroupBox("2. Páginas a Importar")
-        self.grp_src_pages.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_src_pages estilizado pelo tema
         vbox_src_pages = QVBoxLayout(self.grp_src_pages)
 
         self.rb_all_src = QRadioButton("Todas as páginas do arquivo de origem")
@@ -482,7 +483,7 @@ class ImportPdfDialog(QDialog):
 
         # 3. Posição de Inserção
         grp_pos = QGroupBox("3. Posição de Inserção no Documento Atual")
-        grp_pos.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_pos estilizado pelo tema
         vbox_pos = QVBoxLayout(grp_pos)
 
         if total_pages > 0:
@@ -518,7 +519,7 @@ class ImportPdfDialog(QDialog):
         btn_box.addWidget(self.btn_cancel)
 
         self.btn_import = QPushButton("Importar Páginas")
-        self.btn_import.setStyleSheet("background-color: #2563eb; color: white; font-weight: bold; padding: 6px 16px; border-radius: 4px;")
+        self.btn_import.setObjectName("primaryButton")
         self.btn_import.clicked.connect(self._on_accept)
         btn_box.addWidget(self.btn_import)
 
@@ -542,7 +543,7 @@ class ImportPdfDialog(QDialog):
             self.selected_file = fpath
             self.txt_file.setText(fpath)
             self.lbl_src_info.setText(f"✓ Arquivo válido com {self.src_total_pages} página(s).")
-            self.lbl_src_info.setStyleSheet("color: #16a34a; font-weight: 500;")
+            self.lbl_src_info.setStyleSheet("color: #22c55e; font-weight: bold;")
             self.rb_all_src.setText(f"Todas as páginas do arquivo de origem ({self.src_total_pages} páginas)")
             self.txt_src_range.setPlaceholderText(f"Ex: 1-{min(3, self.src_total_pages)} (1 a {self.src_total_pages})")
         except Exception as e:
@@ -551,7 +552,7 @@ class ImportPdfDialog(QDialog):
             self.src_total_pages = 0
             self.txt_file.clear()
             self.lbl_src_info.setText("Nenhum arquivo válido selecionado.")
-            self.lbl_src_info.setStyleSheet("color: #dc2626;")
+            self.lbl_src_info.setStyleSheet("color: #ef4444; font-weight: bold;")
 
     def _on_accept(self):
         if not self.selected_file or not os.path.exists(self.selected_file):
@@ -603,12 +604,12 @@ class ImportImageDialog(QDialog):
         layout.setSpacing(12)
 
         header = QLabel("🖼️ Importar Imagem como Nova Página")
-        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 2px;")
+        header.setObjectName("dialogHeader")
         layout.addWidget(header)
 
         # 1. Imagens Selecionadas
         grp_images = QGroupBox("1. Selecione as Imagens")
-        grp_images.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_images estilizado pelo tema
         vbox_imgs = QVBoxLayout(grp_images)
 
         self.list_widget = QListWidget()
@@ -630,14 +631,14 @@ class ImportImageDialog(QDialog):
         vbox_imgs.addLayout(h_btn)
 
         self.lbl_img_count = QLabel("0 imagem(ns) selecionada(s).")
-        self.lbl_img_count.setStyleSheet("color: #64748b; font-size: 12px;")
+        self.lbl_img_count.setObjectName("dialogHint")
         vbox_imgs.addWidget(self.lbl_img_count)
 
         layout.addWidget(grp_images)
 
         # 2. Posição de Inserção
         grp_pos = QGroupBox("2. Posição de Inserção no Documento")
-        grp_pos.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_pos estilizado pelo tema
         vbox_pos = QVBoxLayout(grp_pos)
 
         if total_pages > 0:
@@ -665,7 +666,7 @@ class ImportImageDialog(QDialog):
 
         # 3. Formato da Página
         grp_fmt = QGroupBox("3. Dimensões da Página")
-        grp_fmt.setStyleSheet("QGroupBox { font-weight: bold; }")
+        # grp_fmt estilizado pelo tema
         vbox_fmt = QVBoxLayout(grp_fmt)
 
         self.rb_a4 = QRadioButton("Ajustar à folha A4 padrão (centralizado com margens, retrato/paisagem automático)")
@@ -687,7 +688,7 @@ class ImportImageDialog(QDialog):
         btn_box.addWidget(self.btn_cancel)
 
         self.btn_import = QPushButton("Inserir Página(s)")
-        self.btn_import.setStyleSheet("background-color: #2563eb; color: white; font-weight: bold; padding: 6px 16px; border-radius: 4px;")
+        self.btn_import.setObjectName("primaryButton")
         self.btn_import.clicked.connect(self._on_accept)
         btn_box.addWidget(self.btn_import)
 
@@ -725,9 +726,10 @@ class ImportImageDialog(QDialog):
         count = len(self.image_paths)
         self.lbl_img_count.setText(f"{count} imagem(ns) selecionada(s).")
         if count > 0:
-            self.lbl_img_count.setStyleSheet("color: #16a34a; font-weight: 500;")
+            self.lbl_img_count.setStyleSheet("color: #22c55e; font-weight: bold;")
         else:
-            self.lbl_img_count.setStyleSheet("color: #64748b;")
+            self.lbl_img_count.setStyleSheet("")
+        self.lbl_img_count.setObjectName("dialogHint")
 
     def _on_accept(self):
         if not self.image_paths:
